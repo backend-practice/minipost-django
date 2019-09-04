@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User
+from django.db import transaction
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 
 from .models import Profile
 
@@ -21,7 +23,10 @@ class UserSerializer(UserPublicSerializer):
     """
     序列化用户User，包含隐私信息，用于读写用户信息
     """
-    nickname = serializers.CharField(source='profile.nickname')
+    nickname = serializers.CharField(
+        source='profile.nickname',
+        validators=[UniqueValidator(queryset=Profile.objects.all())],
+    )
     gender = serializers.ChoiceField(source='profile.gender', choices=Profile.GENDER_CHOICE)
     avatar = serializers.ImageField(source='profile.avatar', read_only=True)
 
@@ -35,15 +40,15 @@ class UserSerializer(UserPublicSerializer):
 
     def create(self, validated_data):
         profile_data = validated_data.pop('profile', {})
-        user = User.objects.create_user(**validated_data)
-        Profile.objects.create(user=user, **profile_data)
-        return user
+        with transaction.atomic():
+            user = User.objects.create_user(**validated_data)
+            Profile.objects.create(user=user, **profile_data)
+            return user
 
     def update(self, instance, validated_data):
         profile_data = validated_data.pop('profile', {})
         instance.username = validated_data.get('username', instance.username)
         instance.email = validated_data.get('email', instance.email)
-        instance.save()
         try:
             profile = instance.profile
         except Profile.DoesNotExist:
@@ -52,5 +57,7 @@ class UserSerializer(UserPublicSerializer):
             profile.user = instance
         profile.nickname = profile_data.get('nickname', profile.nickname)
         profile.gender = profile_data.get('gender', profile.gender)
-        profile.save()
+        with transaction.atomic():
+            instance.save()
+            profile.save()
         return instance
