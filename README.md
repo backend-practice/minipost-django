@@ -16,3 +16,8 @@
 
 详细的依赖见[requirements.txt](requirements.txt)
 
+### 其他
+构建travis
+
+docker
+
