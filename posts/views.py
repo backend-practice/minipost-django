@@ -1,13 +1,12 @@
-import mixin as mixin
-from django.contrib.auth.models import User
-from rest_framework import generics, permissions, mixins, status
-from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
-from rest_framework.response import Response
-
-from posts.models import Post, Comment, Like
+from posts.models import Comment, Like, Post
 from posts.permissions import IsOwnerOrReadonly
-from posts.serializers import PostSerializer, CommentSerializer
+from posts.serializers import CommentSerializer, PostSerializer
+from rest_framework import generics, status
+from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import (
+    IsAuthenticated, IsAuthenticatedOrReadOnly,
+)
+from rest_framework.response import Response
 
 
 class PostList(generics.ListCreateAPIView):
@@ -18,7 +17,7 @@ class PostList(generics.ListCreateAPIView):
     post:
     创建post
     """
-    queryset = Post.objects.all()
+    queryset = Post.objects.all().order_by('-time_created')
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
@@ -101,3 +100,14 @@ class PostLike(generics.GenericAPIView):
             pass
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+class PostFeed(generics.ListAPIView):
+    """
+    get:
+    获取关注用户的Post
+    """
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Post.objects.filter(owner__in=self.request.user.following.all())

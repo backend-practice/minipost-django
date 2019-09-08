@@ -2,9 +2,13 @@ import os
 import time
 from enum import Enum, unique
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+
+
+class User(AbstractUser):
+    following = models.ManyToManyField('self', through='Following', related_name='followers', symmetrical=False)
 
 
 @unique
@@ -47,3 +51,15 @@ class Profile(models.Model):
 
     def __str__(self):
         return 'Profile<%d, %s, %d>' % (self.user.id, self.nickname, self.gender)
+
+
+class Following(models.Model):
+    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following_relationship')
+    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='follower_relationship')
+    time_followed = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('from_user', 'to_user')
+
+    def __str__(self):
+        return '%d, %d, %s' % (self.from_user.id, self.to_user.id, self.time_followed)

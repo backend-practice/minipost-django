@@ -10,5 +10,5 @@ urlpatterns = [
     path('<int:post_id>/comments/', views.CommentList.as_view(), name='comment-list'),
     path('<int:post_id>/comments/<int:pk>/', views.CommentDetail.as_view(), name='comment-detail'),
     path('<int:pk>/like/', views.PostLike.as_view(), name='like'),
-    # path('feed/', views.PostFeed.as_view(), name='feed'),
+    path('feed/', views.PostFeed.as_view(), name='feed'),
 ]

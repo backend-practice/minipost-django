@@ -1,10 +1,11 @@
-from django.contrib.auth.models import User
-from django.db import transaction
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
 
 from users.serializers import UserPublicSerializer
-from .models import Post, Comment, Like
+
+from .models import Comment, Like, Post
+
+User = get_user_model()
 
 
 class PostSerializer(serializers.ModelSerializer):

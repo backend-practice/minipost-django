@@ -1,9 +1,11 @@
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.db import transaction
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from .models import Profile
+from .models import Following, Profile
+
+User = get_user_model()
 
 
 class UserPublicSerializer(serializers.ModelSerializer):
@@ -61,3 +63,14 @@ class UserSerializer(UserPublicSerializer):
             instance.save()
             profile.save()
         return instance
+
+
+class FollowingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Following
+        fields = '__all__'
+
+    def validate(self, attrs):
+        if attrs['from_user'] == attrs['to_user']:
+            raise serializers.ValidationError('You can\'t follow yourself.')
+        return attrs
