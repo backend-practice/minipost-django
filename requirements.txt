@@ -3,3 +3,5 @@ djangorestframework
 drf-yasg[validation]
 packaging
 pillow
+gunicorn
+django-heroku
