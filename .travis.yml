@@ -1,0 +1,19 @@
+language: python
+dist: xenial
+python:
+  - "3.6.7"
+
+install:
+  - pip install isort flake8
+  - pip install -r requirements.txt
+script:
+  - isort -c -rc .
+  - flake8 .
+  - python manage.py test
+deploy:
+  provider: heroku
+  on:
+    branch: master
+  api_key:
+    secure: VWmk1XaUN5VMH4Jm6YS77GRkLBG5aDgXVe83kujIgIZvyx+j9t3Oxszj8cmv4IwF7H0KVMkaXxobX6LYOpGW04DyQw9AiQrpPVNqGTzrrcPIp4Cz62Fm44X6NHT84RVyzxcqII7yLgwd0t6DdyiOpQQu91ratK8Upaf/kux30Fgh5Z1imMh6w+3todREJaX/l+GKpE0QIiCPwkJhEocfVCDT6l7STY4EZEsPolN/m+4FPOBBAaGpFvXyOHIlV9OU88EqE7Bxh6gWjwK4WTFFy/zoS0gbOLA6Z0CraSCstfnTBUhDx/D5VOIAxg9CtSTVhIAaHxY80EL9datQhSaeA8afgTDn4sFFmAPyIKzLJjxSCPxUQfNXEr6/NVa/OVgXNS4w3arBB13MxdmAXCoEMyvJZ5qligo//O7agQ4CvWlk/pjvB8vWzbG/ANmZv4k/tXBJu1IZRGHSj4Lse0m+SiZAC9tSFgmBrY10NJpSOAFrilKGz+bUqc4pjWpIO6+dx0m97acoqdnrnzJz7ydWiGLUiuJGJ+kz1VRGG/gcuK811tpzIW4RxrjKpTS6crpDi26b/UcFm4ndT4+C+iiA3lmfmMKNy4634lzBdlCDKEMVXq8rpvjW4ho9/rs1fBnu/j3NZARpgqkYA+oYi6LwV3XuD+uSSRyK50B6TBM0ZPg=
+  run: "python manage.py migrate"
