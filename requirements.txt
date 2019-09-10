@@ -5,3 +5,4 @@ packaging
 pillow
 gunicorn
 django-heroku
+django-cors-headers
