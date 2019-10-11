@@ -37,23 +37,17 @@ class UserPublicSerializer(UserBaseSerializer):
             'id', 'username', 'nickname', 'gender', 'avatar', 'posts_count', 'following_count', 'followers_count'
         )
 
-    def get_posts_count(self, obj):
-        user = self.context['request'].user
-        if not (user and user.is_authenticated):
-            return 0
-        return Post.objects.filter(owner=user).count()
+    @staticmethod
+    def get_posts_count(obj):
+        return Post.objects.filter(owner=obj).count()
 
-    def get_following_count(self, obj):
-        user = self.context['request'].user
-        if not (user and user.is_authenticated):
-            return 0
-        return user.following.count()
+    @staticmethod
+    def get_following_count(obj):
+        return obj.following.count()
 
-    def get_followers_count(self, obj):
-        user = self.context['request'].user
-        if not (user and user.is_authenticated):
-            return 0
-        return user.followers.count()
+    @staticmethod
+    def get_followers_count(obj):
+        return obj.followers.count()
 
 
 class UserSerializer(UserPublicSerializer):
