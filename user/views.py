@@ -1,9 +1,9 @@
 from django.contrib.auth import get_user_model
-from posts.serializers import PostSerializer
 from rest_framework import filters, generics, mixins
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 
+from posts.serializers import PostSerializer
 from users.models import Following
 from users.serializers import (
     FollowingSerializer, UserPublicSerializer, UserSerializer,

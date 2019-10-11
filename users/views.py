@@ -1,8 +1,8 @@
 from django.contrib.auth import get_user_model
-from posts.serializers import PostSerializer
 from rest_framework import filters, generics
 from rest_framework.generics import get_object_or_404
 
+from posts.serializers import PostSerializer
 from users.serializers import UserPublicSerializer, UserSerializer
 
 User = get_user_model()

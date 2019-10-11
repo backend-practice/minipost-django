@@ -1,12 +1,13 @@
-from posts.models import Comment, Like, Post
-from posts.permissions import IsOwnerOrReadonly
-from posts.serializers import CommentSerializer, PostSerializer
 from rest_framework import generics, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import (
     IsAuthenticated, IsAuthenticatedOrReadOnly,
 )
 from rest_framework.response import Response
+
+from posts.models import Comment, Like, Post
+from posts.permissions import IsOwnerOrReadonly
+from posts.serializers import CommentSerializer, PostSerializer
 
 
 class PostList(generics.ListCreateAPIView):

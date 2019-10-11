@@ -3,14 +3,16 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
+from posts.models import Post
+
 from .models import Following, Profile
 
 User = get_user_model()
 
 
-class UserPublicSerializer(serializers.ModelSerializer):
+class UserBaseSerializer(serializers.ModelSerializer):
     """
-    序列化用户User，不包含隐私信息
+    序列化用户User，只包含基本信息，不包含隐私信息和关联信息
     """
     nickname = serializers.CharField(source='profile.nickname')
     gender = serializers.ChoiceField(source='profile.gender', choices=Profile.GENDER_CHOICE)
@@ -19,6 +21,39 @@ class UserPublicSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'nickname', 'gender', 'avatar')
+
+
+class UserPublicSerializer(UserBaseSerializer):
+    """
+    序列化用户User，不包含隐私信息，包含关联信息
+    """
+    posts_count = serializers.SerializerMethodField()
+    following_count = serializers.SerializerMethodField()
+    followers_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = (
+            'id', 'username', 'nickname', 'gender', 'avatar', 'posts_count', 'following_count', 'followers_count'
+        )
+
+    def get_posts_count(self, obj):
+        user = self.context['request'].user
+        if not (user and user.is_authenticated):
+            return 0
+        return Post.objects.filter(owner=user).count()
+
+    def get_following_count(self, obj):
+        user = self.context['request'].user
+        if not (user and user.is_authenticated):
+            return 0
+        return user.following.count()
+
+    def get_followers_count(self, obj):
+        user = self.context['request'].user
+        if not (user and user.is_authenticated):
+            return 0
+        return user.followers.count()
 
 
 class UserSerializer(UserPublicSerializer):
@@ -34,7 +69,10 @@ class UserSerializer(UserPublicSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'nickname', 'gender', 'avatar', 'password')
+        fields = (
+            'id', 'username', 'email', 'nickname', 'gender', 'avatar', 'password', 'posts_count', 'following_count',
+            'followers_count',
+        )
 
         extra_kwargs = {
             'password': {'write_only': True},
